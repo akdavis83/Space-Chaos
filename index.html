@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>START MENU</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<style>
+        body {
+            margin: 0;
+            overflow: hidden; 
+            background-color: #ffffff00; 
+            color: rgba(255, 255, 255, 0); 
+            font-family: 'Courier New', monospace; 
+            
+        }
+        canvas {
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+        }
+        #ui {
+            position: absolute;
+            top: 15px; 
+            width: 100%;
+            text-align: center;
+            z-index: -1; 
+            pointer-events: none; 
+        }
+        #info {
+            font-size: 14px;
+            padding: 10px 18px; 
+            background-color: rgba(25, 30, 50, 0.35); 
+            border-radius: 10px; 
+            display: inline-block;
+            text-shadow: 0 0 5px rgba(0, 128, 255, 0.8); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); 
+            transition: all 0.3s ease; 
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05); 
+        }
+        #loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; 
+            transition: opacity 0.6s ease-out; 
+        }
+        #loading span {
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-bottom: 15px; 
+        }
+        #progress-container {
+             width: 60%;
+             max-width: 300px;
+             height: 6px;
+             background-color: rgba(255, 255, 255, 0.1);
+             border-radius: 3px;
+             overflow: hidden; 
+        }
+        #progress {
+            height: 100%;
+            width: 0%; 
+            background: linear-gradient(90deg, #00a2ff, #00ffea); 
+            transition: width 0.3s ease; 
+            border-radius: 3px;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            z-index: -1;
+            text-align: center;
+            pointer-events: all; 
+            background-color: rgba(255, 255, 255, 0); 
+            padding: 15px 25px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            backdrop-filter: blur(12px); 
+             -webkit-backdrop-filter: blur(12px); 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+        }
+        button {
+            background: rgba(0, 80, 180, 0.7); 
+            color: white;
+            border: 1px solid rgba(0, 180, 255, 0.6); 
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin: 0 8px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.25s ease;
+        }
+        button:hover {
+            background: rgba(0, 110, 220, 0.9); 
+            border-color: rgba(0, 210, 255, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 150, 255, 0.3);
+        }
+        #color-picker {
+            margin-top: 15px; 
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2); 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.4); 
+        }
+        .color-option:hover {
+            transform: scale(1.15);
+            border-color: rgba(255, 255, 255, 0.7); 
+        }
+         .color-option.active {
+             transform: scale(1.18);
+             border-color: white;
+             box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); 
+         }
+         /* Base Styles */
+:root {
+	--primary: #9d00ff;
+	--secondary: #00e5ff;
+	--accent: #ff00e5;
+	--background: #050510;
+	--card-bg: rgba(20, 20, 40, 0.7);
+	--text-primary: #ffffff;
+	--text-secondary: #b8b8ff;
+	--glow-primary: 0 0 10px rgba(157, 0, 255, 0.7),
+		0 0 20px rgba(157, 0, 255, 0.5);
+	--glow-secondary: 0 0 10px rgba(0, 229, 255, 0.7),
+		0 0 20px rgba(0, 229, 255, 0.5);
+	--glow-accent: 0 0 10px rgba(255, 0, 229, 0.7), 0 0 20px rgba(255, 0, 229, 0.5);
+	--card-width: 300px;
+	--card-height: 420px;
+	--carousel-radius: 400px;
+	--transition-speed: 0.5s;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body,
+html {
+	height: 100%;
+	font-family: "Chakra Petch", sans-serif;
+	background-color: var(--background);
+	color: var(--text-primary);
+	overflow: hidden; /* Prevent page scrolling */
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: "Orbitron", sans-serif;
+	font-weight: 700;
+	letter-spacing: 1px;
+}
+
+.title {
+	font-size: 2.5rem;
+	margin-bottom: 0.5rem;
+	background: linear-gradient(90deg, var(--primary), var(--secondary));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	text-shadow: 0 0 15px rgba(157, 0, 255, 0.5);
+	animation: pulse 3s infinite alternate;
+}
+
+/* Cosmic Background */
+.cosmos-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+	background: rgba(255, 255, 255, 0);
+	overflow: auto;
+}
+
+.stars-container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-image: radial-gradient(1px 1px at 25% 25%, rgb(10, 10, 10), rgba(0, 0, 0, 0)),
+		radial-gradient(1px 1px at 50% 50%, white, rgba(0, 0, 0, 0)),
+		radial-gradient(2px 2px at 75% 75%, white, rgba(0, 0, 0, 0)),
+		radial-gradient(2px 2px at 100% 100%, white, rgba(0, 0, 0, 0));
+	background-size: 200px 200px, 300px 300px, 400px 400px, 600px 600px;
+	background-repeat: repeat;
+	animation: twinkle 10s linear infinite;
+}
+
+@keyframes twinkle {
+	0% {
+		background-position: 0 0, 0 0, 0 0, 0 0;
+	}
+	100% {
+		background-position: 200px 200px, 300px 300px, 400px 400px, 600px 600px;
+	}
+}
+
+/* Carousel Container */
+.carousel-container {
+	position: relative;
+	width: 100%;
+	height: 500px;
+	perspective: 1000px;
+	transform-style: preserve-3d;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	touch-action: none; /* Prevent default touch actions */
+}
+
+.carousel {
+	position: relative;
+	width: var(--carousel-radius);
+	height: var(--carousel-radius);
+	transform-style: preserve-3d;
+	transition: transform 0.5s ease;
+}
+
+/* Memory Cards */
+.memory-card {
+	position: absolute;
+	width: var(--card-width);
+	height: var(--card-height);
+	left: 50%;
+	top: 50%;
+	margin-left: calc(var(--card-width) / -2);
+	margin-top: calc(var(--card-height) / -2);
+	transform-style: preserve-3d;
+	transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	cursor: pointer;
+}
+
+.card-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-style: preserve-3d;
+	transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.memory-card:hover .card-inner {
+	transform: translateZ(20px);
+}
+
+.memory-card.flipped .card-inner {
+	transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	backface-visibility: hidden;
+	border-radius: 15px;
+	overflow: hidden;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.card-front {
+	background: linear-gradient(
+		135deg,
+		rgba(30, 30, 60, 0.8),
+		rgba(20, 20, 40, 0.9)
+	);
+	border: 1px solid rgba(157, 0, 255, 0.3);
+	transform-style: preserve-3d;
+}
+
+.card-back {
+	background: linear-gradient(
+		135deg,
+		rgba(20, 20, 40, 0.9),
+		rgba(30, 30, 60, 0.8)
+	);
+	border: 1px solid rgba(0, 229, 255, 0.3);
+	transform: rotateY(180deg);
+}
+
+.card-content {
+	padding: 20px;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.memory-date {
+	font-family: "Orbitron", sans-serif;
+	font-size: 0.8rem;
+	color: var(--accent);
+	margin-bottom: 10px;
+	text-shadow: 0 0 5px rgba(255, 0, 229, 0.7);
+}
+
+.memory-card h3 {
+	font-size: 1.5rem;
+	margin-bottom: 15px;
+	color: var(--text-primary);
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.memory-image {
+	width: 100%;
+	height: 150px;
+	margin-bottom: 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.3);
+}
+
+.memory-image i {
+	color: var(--primary);
+	font-size: 4rem;
+	text-shadow: var(--glow-primary);
+	animation: pulse 3s infinite alternate;
+	z-index: 2;
+}
+
+.glitch-effect {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		45deg,
+		transparent 65%,
+		rgba(157, 0, 255, 0.3) 70%,
+		transparent 75%
+	);
+	background-size: 200% 200%;
+	animation: glitch 3s linear infinite;
+	z-index: 1;
+}
+
+@keyframes glitch {
+	0% {
+		background-position: 0 0;
+	}
+	25% {
+		background-position: 100% 0;
+	}
+	50% {
+		background-position: 100% 100%;
+	}
+	75% {
+		background-position: 0 100%;
+	}
+	100% {
+		background-position: 0 0;
+	}
+}
+
+.memory-preview {
+	font-size: 0.9rem;
+	color: var(--text-secondary);
+	margin-bottom: 15px;
+	flex-grow: 1;
+}
+
+.card-back .card-content p {
+	font-size: 0.9rem;
+	color: var(--text-secondary);
+	margin-bottom: 20px;
+	line-height: 1.5;
+	flex-grow: 1;
+}
+
+.memory-coordinates {
+	font-family: "Orbitron", sans-serif;
+	font-size: 0.8rem;
+	color: var(--secondary);
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.time-stamp {
+	color: var(--accent);
+}
+
+.card-glow {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 15px;
+	pointer-events: none;
+	background: radial-gradient(
+		circle at 50% 50%,
+		rgba(0, 128, 255, 0),
+		transparent 70%
+	);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.memory-card:hover .card-glow {
+	opacity: 1;
+}
+
+/* Carousel Controls */
+.carousel-controls {
+	position: absolute;
+	bottom: -50px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	z-index: 10;
+}
+
+.control-btn {
+	background: rgba(20, 20, 40, 0.7);
+	border: 1px solid var(--primary);
+	color: var(--text-primary);
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: var(--glow-primary);
+}
+
+.control-btn:hover {
+	background: rgba(30, 30, 60, 0.9);
+	transform: scale(1.1);
+}
+
+/* Footer */
+footer {
+	position: relative;
+	z-index: 10;
+}
+
+.instructions {
+	font-size: 0.8rem;
+	color: var(--text-secondary);
+	opacity: 0.7;
+}
+
+/* Animations */
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 0.8;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+	:root {
+		--card-width: 250px;
+		--card-height: 350px;
+		--carousel-radius: 300px;
+	}
+
+	.title {
+		font-size: 1.8rem;
+	}
+
+	.carousel-container {
+		height: 400px;
+	}
+
+	.memory-card h3 {
+		font-size: 1.2rem;
+	}
+
+	.memory-image {
+		height: 120px;
+	}
+}
+
+@media (max-width: 576px) {
+	:root {
+		--card-width: 220px;
+		--card-height: 320px;
+		--carousel-radius: 250px;
+	}
+
+	.title {
+		font-size: 1.5rem;
+	}
+
+	.carousel-container {
+		height: 350px;
+	}
+}
+    </style>
+
+    <div id="loading">
+        <span>Initializing...</span>
+        <div id="progress-container">
+             <div id="progress"></div>
+        </div>
+    </div>
+
+    <div id="ui">
+        <div id="info">Shape: Sphere (Click to morph)</div>
+    </div>
+
+    <div id="controls">
+        <button id="shape-btn" onclick="window.location.href='s.html'">START GAME</button>
+        <button id="museum-btn" onclick="window.location.href='m.html'">MUSEUM</button>
+
+        <div id="color-picker" style="z-index: -1;">
+            <div class="color-option" data-scheme="fire" style="background: linear-gradient(to bottom right, #ff4500, #ffcc00)"></div>
+            <div class="color-option" data-scheme="neon" style="background: linear-gradient(to bottom right, #ff00ff, #00ffff)"></div>
+            <div class="color-option" data-scheme="nature" style="background: linear-gradient(to bottom right, #00ff00, #66ffcc)"></div>
+            <div class="color-option" data-scheme="rainbow" style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)"></div>
+        </div>
+    </div>
+
+    
+
+<body>
+<!-- partial:index.partial.html -->
+<div class="cosmos-background">
+	<div class="stars-container"></div>
+</div>
+
+<div class="container-fluid h-100 d-flex flex-column">
+	<header class="py-3 text-center" style="z-index: 1000;">
+		<h1 class="title" style="z-index: 1000;">SPACE CHAOS</h1>
+	</header>
+
+	<main class="flex-grow-1 d-flex align-items-center justify-content-center position-relative">
+		<div class="carousel-container">
+			<div class="carousel" id="memory-carousel">
+				<!-- Memory Card 1 -->
+				<div class="memory-card" data-memory-id="1">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: A-127</div>
+								<h3>SPACE CHAOS</h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-rocket fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview">Enter the portal to defend the galaxy...</p>
+                                <p>
+                                    
+                                </p>
+								<div class="card-glow">
+                                    
+                                </div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3>CREDITS</h3>
+								<p>Music Credits</p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+Simulacra by Scott Buckley | www.scottbuckley.com.au
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+                                    </i> 37.7749° N, 122.4194° W</span>
+									<span class="time-stamp">
+                                        <i class="fa-regular fa-clock"></i> 03:27:16</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Memory Card 2 -->
+				<div class="memory-card" data-memory-id="2">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: C-982</div>
+								<h3>SHIP DIRECTORY</h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-eye fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview">SPACE CHAOS MUSEUM...</p>
+								<div class="card-glow"></div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3>3D SHIPS</h3>
+								<p>Space Chaos enemy ships 3D.</p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+                                        Hitman by Kevin MacLeod | https://incompetech.com/
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+                                    </i> 51.5074° N, 0.1278° W</span>
+									<span class="time-stamp"><i class="fa-regular fa-clock"></i> 17:42:03</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Memory Card 3 -->
+				<div class="memory-card" data-memory-id="3">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: F-451</div>
+								<h3></h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-book fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview"></p>
+								<div class="card-glow"></div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3></h3>
+								<p></p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+                                        Brazilian Street Fight by Punch Deck | https://soundcloud.com/punch-deck
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons Attribution 3.0 Unported License
+https://creativecommons.org/licenses/by/3.0/deed.en_US
+                                    </i> 40.7128° N, 74.0060° W</span>
+									<span class="time-stamp"><i class="fa-regular fa-clock"></i> 09:13:27</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Memory Card 4 -->
+				<div class="memory-card" data-memory-id="4">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: X-000</div>
+								<h3></h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-atom fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview"></p>
+								<div class="card-glow"></div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3></h3>
+								<p></p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+                                        Powerful Trap Beat | Strong by Alex-Productions | https://onsound.eu/
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+                                    </i> 0.0000° N, 0.0000° E</span>
+									<span class="time-stamp"><i class="fa-regular fa-clock"></i> --:--:--</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Memory Card 5 -->
+				<div class="memory-card" data-memory-id="5">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: H-221</div>
+								<h3></h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-clone fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview"></p>
+								<div class="card-glow"></div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3></h3>
+								<p></p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+                                        Volitile Reaction by Kevin MacLeod | https://incompetech.com/
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+                                    </i> 35.6762° N, 139.6503° E</span>
+									<span class="time-stamp"><i class="fa-regular fa-clock"></i> 22:07:59</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Memory Card 6 -->
+				<div class="memory-card" data-memory-id="6">
+					<div class="card-inner">
+						<div class="card-front">
+							<div class="card-content">
+								<div class="memory-date">DIMENSION: R-000</div>
+								<h3></h3>
+								<div class="memory-image">
+									<i class="fa-solid fa-home fa-3x"></i>
+									<div class="glitch-effect"></div>
+								</div>
+								<p class="memory-preview"></p>
+								<div class="card-glow"></div>
+							</div>
+						</div>
+						<div class="card-back">
+							<div class="card-content">
+								<h3></h3>
+								<p></p>
+								<div class="memory-coordinates">
+									<span><i class="fa-solid fa-location-dot">
+                                        The Sound Of Rain by Sappheiros | https://soundcloud.com/sappheirosmusic
+Music promoted on https://www.chosic.com/free-music/all/
+Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+https://creativecommons.org/licenses/by/3.0/
+                                    </i> 0° N, 0° W</span>
+									<span class="time-stamp"><i class="fa-regular fa-clock"></i> </span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="carousel-controls">
+			<button id="prev-btn" class="control-btn">
+				<i class="fa-solid fa-chevron-left"></i>
+			</button>
+			<button id="next-btn" class="control-btn">
+				<i class="fa-solid fa-chevron-right"></i>
+			</button>
+		</div>
+	</main>
+
+	<footer class="py-3 text-center">
+		<p class="instructions">GAME MENU • Use arrow keys to navigate • S-START • M-MUSEUM</p>
+	</footer>
+</div>
+
+    <canvas id="webglCanvas"></canvas>
+    <audio id="bg-music" src="TremLoadingloopl.wav" loop></audio>
+    <audio id="left-sound" src="on.ogg"></audio>
+    <audio id="right-sound" src="button1.ogg"></audio>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/",
+          "animejs": "https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.es.js",
+          "simplex-noise": "https://cdn.skypack.dev/simplex-noise@4.0.1"
+        }
+      }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import anime from 'animejs';
+        import { createNoise3D, createNoise4D } from 'simplex-noise';
+
+        let scene, camera, renderer, controls, clock;
+        let composer, bloomPass; 
+
+        let particlesGeometry, particlesMaterial, particleSystem;
+        let currentPositions, sourcePositions, targetPositions, swarmPositions; 
+        let particleSizes, particleOpacities, particleEffectStrengths; 
+        let noise3D, noise4D; 
+
+        let morphTimeline = null; 
+        let isInitialized = false;
+        let isMorphing = false;
+
+        const CONFIG = {
+            particleCount: 15000,
+            shapeSize: 14,
+            swarmDistanceFactor: 1.5,
+            swirlFactor: 4.0,
+            noiseFrequency: 0.1,
+            noiseTimeScale: 0.04,
+            noiseMaxStrength: 2.8,
+            colorScheme: 'fire',
+            morphDuration: 4000,
+            particleSizeRange: [0.08, 0.25],
+            starCount: 18000,
+            bloomStrength: 1.3,
+            bloomRadius: 0.5,
+            bloomThreshold: 0.05,
+            idleFlowStrength: 0.25,
+            idleFlowSpeed: 0.08,
+            idleRotationSpeed: 0.02,
+            morphSizeFactor: 0.5, 
+            morphBrightnessFactor: 0.6 
+        };
+
+        const SHAPES = [
+            
+        ];
+        let currentShapeIndex = 0;
+
+        const morphState = { progress: 0.0 };
+
+        const COLOR_SCHEMES = {
+            fire: { startHue: 0, endHue: 45, saturation: 0.95, lightness: 0.6 },
+            neon: { startHue: 300, endHue: 180, saturation: 1.0, lightness: 0.65 },
+            nature: { startHue: 90, endHue: 160, saturation: 0.85, lightness: 0.55 },
+            rainbow: { startHue: 0, endHue: 360, saturation: 0.9, lightness: 0.6 }
+        };
+
+        const tempVec = new THREE.Vector3();
+        const sourceVec = new THREE.Vector3();
+        const targetVec = new THREE.Vector3();
+        const swarmVec = new THREE.Vector3();
+        const noiseOffset = new THREE.Vector3();
+        const flowVec = new THREE.Vector3();
+        const bezPos = new THREE.Vector3();
+        const swirlAxis = new THREE.Vector3();
+        const currentVec = new THREE.Vector3();
+
+        function generateSphere(count, size) {
+            const points = new Float32Array(count * 3);
+            const phi = Math.PI * (Math.sqrt(5) - 1);
+            for (let i = 0; i < count; i++) {
+                const y = 1 - (i / (count - 1)) * 2;
+                const radius = Math.sqrt(1 - y * y);
+                const theta = phi * i;
+                const x = Math.cos(theta) * radius;
+                const z = Math.sin(theta) * radius;
+                points[i * 3] = x * size;
+                points[i * 3 + 1] = y * size;
+                points[i * 3 + 2] = z * size;
+            }
+            return points;
+        }
+        function generateCube(count, size) {
+            const points = new Float32Array(count * 3);
+            const halfSize = size / 2;
+            for (let i = 0; i < count; i++) {
+                const face = Math.floor(Math.random() * 6);
+                const u = Math.random() * size - halfSize;
+                const v = Math.random() * size - halfSize;
+                switch (face) {
+                    case 0: points.set([halfSize, u, v], i * 3); break;
+                    case 1: points.set([-halfSize, u, v], i * 3); break;
+                    case 2: points.set([u, halfSize, v], i * 3); break;
+                    case 3: points.set([u, -halfSize, v], i * 3); break;
+                    case 4: points.set([u, v, halfSize], i * 3); break;
+                    case 5: points.set([u, v, -halfSize], i * 3); break;
+                }
+            }
+            return points;
+        }
+        function generatePyramid(count, size) {
+            const points = new Float32Array(count * 3);
+            const halfBase = size / 2;
+            const height = size * 1.2;
+            const apex = new THREE.Vector3(0, height / 2, 0);
+            const baseVertices = [
+                new THREE.Vector3(-halfBase, -height / 2, -halfBase), new THREE.Vector3(halfBase, -height / 2, -halfBase),
+                new THREE.Vector3(halfBase, -height / 2, halfBase), new THREE.Vector3(-halfBase, -height / 2, halfBase)
+            ];
+            const baseArea = size * size;
+            const sideFaceHeight = Math.sqrt(Math.pow(height, 2) + Math.pow(halfBase, 2));
+            const sideFaceArea = 0.5 * size * sideFaceHeight;
+            const totalArea = baseArea + 4 * sideFaceArea;
+            const baseWeight = baseArea / totalArea;
+            const sideWeight = sideFaceArea / totalArea;
+            for (let i = 0; i < count; i++) {
+                const r = Math.random();
+                let p = new THREE.Vector3(); let u, v;
+                if (r < baseWeight) {
+                    u = Math.random(); v = Math.random();
+                    p.lerpVectors(baseVertices[0], baseVertices[1], u);
+                    const p2 = new THREE.Vector3().lerpVectors(baseVertices[3], baseVertices[2], u);
+                    p.lerp(p2, v);
+                } else {
+                    const faceIndex = Math.floor((r - baseWeight) / sideWeight);
+                    const v1 = baseVertices[faceIndex]; const v2 = baseVertices[(faceIndex + 1) % 4];
+                    u = Math.random(); v = Math.random();
+                    if (u + v > 1) { u = 1 - u; v = 1 - v; }
+                    p.addVectors(v1, tempVec.subVectors(v2, v1).multiplyScalar(u));
+                    p.add(tempVec.subVectors(apex, v1).multiplyScalar(v));
+                }
+                points.set([p.x, p.y, p.z], i * 3);
+            }
+            return points;
+        }
+        function generateTorus(count, size) {
+            const points = new Float32Array(count * 3);
+            const R = size * 0.7; const r = size * 0.3;
+            for (let i = 0; i < count; i++) {
+                const theta = Math.random() * Math.PI * 2; const phi = Math.random() * Math.PI * 2;
+                const x = (R + r * Math.cos(phi)) * Math.cos(theta);
+                const y = r * Math.sin(phi);
+                const z = (R + r * Math.cos(phi)) * Math.sin(theta);
+                points[i * 3] = x; points[i * 3 + 1] = y; points[i * 3 + 2] = z;
+            }
+            return points;
+        }
+        function generateGalaxy(count, size) {
+            const points = new Float32Array(count * 3);
+            const arms = 4; const armWidth = 0.6; const bulgeFactor = 0.3;
+            for (let i = 0; i < count; i++) {
+                const t = Math.pow(Math.random(), 1.5); const radius = t * size;
+                const armIndex = Math.floor(Math.random() * arms);
+                const armOffset = (armIndex / arms) * Math.PI * 2;
+                const rotationAmount = radius / size * 6; const angle = armOffset + rotationAmount;
+                const spread = (Math.random() - 0.5) * armWidth * (1 - radius / size);
+                const theta = angle + spread;
+                const x = radius * Math.cos(theta); const z = radius * Math.sin(theta);
+                const y = (Math.random() - 0.5) * size * 0.1 * (1 - radius / size * bulgeFactor);
+                points[i * 3] = x; points[i * 3 + 1] = y; points[i * 3 + 2] = z;
+            }
+            return points;
+        }
+        function generateWave(count, size) {
+            const points = new Float32Array(count * 3);
+            const waveScale = size * 0.4; const frequency = 3;
+            for (let i = 0; i < count; i++) {
+                const u = Math.random() * 2 - 1; const v = Math.random() * 2 - 1;
+                const x = u * size; const z = v * size;
+                const dist = Math.sqrt(u * u + v * v); const angle = Math.atan2(v, u);
+                const y = Math.sin(dist * Math.PI * frequency) * Math.cos(angle * 2) * waveScale * (1 - dist);
+                points[i * 3] = x; points[i * 3 + 1] = y; points[i * 3 + 2] = z;
+            }
+            return points;
+        }
+
+        function init() {
+            let progress = 0;
+            const progressBar = document.getElementById('progress');
+            const loadingScreen = document.getElementById('loading');
+            function updateProgress(increment) {
+                progress += increment;
+                progressBar.style.width = `${Math.min(100, progress)}%`;
+                if (progress >= 100) {
+                    setTimeout(() => {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => { loadingScreen.style.display = 'none'; }, 600);
+                    }, 200);
+                }
+            }
+
+            clock = new THREE.Clock();
+            noise3D = createNoise3D(() => Math.random());
+            noise4D = createNoise4D(() => Math.random());
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000308, 0.03);
+            updateProgress(5);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 8, 28); 
+            camera.lookAt(scene.position);
+            updateProgress(5);
+
+            const canvas = document.getElementById('webglCanvas');
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.1;
+            updateProgress(10);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; controls.dampingFactor = 0.05;
+            controls.minDistance = 5; controls.maxDistance = 80;
+            controls.autoRotate = true; controls.autoRotateSpeed = 0.3;
+            updateProgress(5);
+
+            scene.add(new THREE.AmbientLight(0x404060));
+            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
+            dirLight1.position.set(15, 20, 10); scene.add(dirLight1);
+            const dirLight2 = new THREE.DirectionalLight(0x88aaff, 0.9);
+            dirLight2.position.set(-15, -10, -15); scene.add(dirLight2);
+            updateProgress(10);
+
+            setupPostProcessing(); updateProgress(10);
+            createStarfield(); updateProgress(15);
+            setupParticleSystem(); updateProgress(25);
+
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('click', onCanvasClick);
+            document.getElementById('shape-btn').addEventListener('click', triggerMorph);
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                    e.target.classList.add('active');
+                    CONFIG.colorScheme = e.target.dataset.scheme;
+                    updateColors();
+                });
+            });
+            document.querySelector(`.color-option[data-scheme="${CONFIG.colorScheme}"]`).classList.add('active');
+            updateProgress(15);
+
+            isInitialized = true;
+            animate();
+            console.log("Initialization complete.");
+        }
+
+        function setupPostProcessing() {
+            composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), CONFIG.bloomStrength, CONFIG.bloomRadius, CONFIG.bloomThreshold);
+            composer.addPass(bloomPass);
+        }
+
+        function createStarfield() {
+            const starVertices = []; const starSizes = []; const starColors = [];
+            const starGeometry = new THREE.BufferGeometry();
+            for (let i = 0; i < CONFIG.starCount; i++) {
+                tempVec.set( THREE.MathUtils.randFloatSpread(400), THREE.MathUtils.randFloatSpread(400), THREE.MathUtils.randFloatSpread(400) );
+                if (tempVec.length() < 100) tempVec.setLength(100 + Math.random() * 300);
+                starVertices.push(tempVec.x, tempVec.y, tempVec.z);
+                starSizes.push(Math.random() * 0.15 + 0.05);
+                const color = new THREE.Color();
+                if (Math.random() < 0.1) { color.setHSL(Math.random(), 0.7, 0.65); } else { color.setHSL(0.6, Math.random() * 0.1, 0.8 + Math.random() * 0.2); }
+                starColors.push(color.r, color.g, color.b);
+            }
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+            starGeometry.setAttribute('size', new THREE.Float32BufferAttribute(starSizes, 1));
+            const starMaterial = new THREE.ShaderMaterial({
+                 uniforms: { pointTexture: { value: createStarTexture() } },
+                 vertexShader: `
+                      attribute float size; varying vec3 vColor; varying float vSize;
+                      void main() {
+                           vColor = color; vSize = size; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                           gl_PointSize = size * (400.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition;
+                      }`,
+                 fragmentShader: `
+                      uniform sampler2D pointTexture; varying vec3 vColor; varying float vSize;
+                      void main() {
+                           float alpha = texture2D(pointTexture, gl_PointCoord).a; if (alpha < 0.1) discard;
+                           gl_FragColor = vec4(vColor, alpha * 0.9);
+                      }`,
+                 blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, vertexColors: true
+             });
+            scene.add(new THREE.Points(starGeometry, starMaterial));
+        }
+
+        function createStarTexture() {
+            const size = 64; const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size; const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)'); gradient.addColorStop(0.2, 'rgba(255,255,255,0.8)');
+            gradient.addColorStop(0.5, 'rgba(255,255,255,0.3)'); gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            context.fillStyle = gradient; context.fillRect(0, 0, size, size);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function setupParticleSystem() {
+            targetPositions = SHAPES.map(shape => shape.generator(CONFIG.particleCount, CONFIG.shapeSize));
+            particlesGeometry = new THREE.BufferGeometry();
+
+            currentPositions = new Float32Array(targetPositions[0]);
+            sourcePositions = new Float32Array(targetPositions[0]);
+            swarmPositions = new Float32Array(CONFIG.particleCount * 3);
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(currentPositions, 3));
+
+            particleSizes = new Float32Array(CONFIG.particleCount);
+            particleOpacities = new Float32Array(CONFIG.particleCount);
+            particleEffectStrengths = new Float32Array(CONFIG.particleCount);
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                particleSizes[i] = THREE.MathUtils.randFloat(CONFIG.particleSizeRange[0], CONFIG.particleSizeRange[1]);
+                particleOpacities[i] = 1.0;
+                particleEffectStrengths[i] = 0.0;
+            }
+            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+            particlesGeometry.setAttribute('opacity', new THREE.BufferAttribute(particleOpacities, 1));
+            particlesGeometry.setAttribute('aEffectStrength', new THREE.BufferAttribute(particleEffectStrengths, 1));
+
+            const colors = new Float32Array(CONFIG.particleCount * 3);
+            updateColorArray(colors, currentPositions);
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            particlesMaterial = new THREE.ShaderMaterial({
+                 uniforms: {
+                      pointTexture: { value: createStarTexture() }
+                 },
+                 vertexShader: `
+                      attribute float size;
+                      attribute float opacity;
+                      attribute float aEffectStrength;
+                      varying vec3 vColor;
+                      varying float vOpacity;
+                      varying float vEffectStrength;
+
+                      void main() {
+                           vColor = color;
+                           vOpacity = opacity;
+                           vEffectStrength = aEffectStrength;
+
+                           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+                           float sizeScale = 1.0 - vEffectStrength * ${CONFIG.morphSizeFactor.toFixed(2)};
+                           gl_PointSize = size * sizeScale * (400.0 / -mvPosition.z);
+
+                           gl_Position = projectionMatrix * mvPosition;
+                      }
+                 `,
+                 fragmentShader: `
+                      uniform sampler2D pointTexture;
+                      varying vec3 vColor;
+                      varying float vOpacity;
+                      varying float vEffectStrength;
+
+                      void main() {
+                           float alpha = texture2D(pointTexture, gl_PointCoord).a;
+                           if (alpha < 0.05) discard;
+
+                           vec3 finalColor = vColor * (1.0 + vEffectStrength * ${CONFIG.morphBrightnessFactor.toFixed(2)});
+
+                           gl_FragColor = vec4(finalColor, alpha * vOpacity);
+                      }
+                 `,
+                 blending: THREE.AdditiveBlending,
+                 depthTest: true,
+                 depthWrite: false,
+                 transparent: true,
+                 vertexColors: true
+            });
+
+            particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particleSystem);
+        }
+
+        function updateColorArray(colors, positionsArray) {
+            const colorScheme = COLOR_SCHEMES[CONFIG.colorScheme];
+            const center = new THREE.Vector3(0, 0, 0);
+            const maxRadius = CONFIG.shapeSize * 1.1;
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                const i3 = i * 3;
+                tempVec.fromArray(positionsArray, i3);
+                const dist = tempVec.distanceTo(center);
+                let hue;
+                if (CONFIG.colorScheme === 'rainbow') {
+                    const normX = (tempVec.x / maxRadius + 1) / 2; const normY = (tempVec.y / maxRadius + 1) / 2; const normZ = (tempVec.z / maxRadius + 1) / 2;
+                    hue = (normX * 120 + normY * 120 + normZ * 120) % 360;
+                } else {
+                    hue = THREE.MathUtils.mapLinear( dist, 0, maxRadius, colorScheme.startHue, colorScheme.endHue );
+                }
+                const noiseValue = (noise3D(tempVec.x * 0.2, tempVec.y * 0.2, tempVec.z * 0.2) + 1) * 0.5;
+                const saturation = THREE.MathUtils.clamp(colorScheme.saturation * (0.9 + noiseValue * 0.2), 0, 1);
+                const lightness = THREE.MathUtils.clamp(colorScheme.lightness * (0.85 + noiseValue * 0.3), 0.1, 0.9);
+                const color = new THREE.Color().setHSL(hue / 360, saturation, lightness);
+                color.toArray(colors, i3);
+            }
+        }
+
+        function updateColors() {
+            const colors = particlesGeometry.attributes.color.array;
+            updateColorArray(colors, particlesGeometry.attributes.position.array);
+            particlesGeometry.attributes.color.needsUpdate = true;
+        }
+
+        function triggerMorph() {
+            if (isMorphing) return;
+            isMorphing = true; controls.autoRotate = false; console.log("Morphing triggered...");
+            document.getElementById('info').innerText = `Morphing...`;
+            document.getElementById('info').style.textShadow = '0 0 8px rgba(255, 150, 50, 0.9)';
+            sourcePositions.set(currentPositions);
+            const nextShapeIndex = (currentShapeIndex + 1) % SHAPES.length;
+            const nextTargetPositions = targetPositions[nextShapeIndex];
+            const centerOffsetAmount = CONFIG.shapeSize * CONFIG.swarmDistanceFactor;
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                const i3 = i * 3;
+                sourceVec.fromArray(sourcePositions, i3); targetVec.fromArray(nextTargetPositions, i3);
+                swarmVec.lerpVectors(sourceVec, targetVec, 0.5);
+                const offsetDir = tempVec.set( noise3D(i * 0.05, 10, 10), noise3D(20, i * 0.05, 20), noise3D(30, 30, i * 0.05) ).normalize();
+                const distFactor = sourceVec.distanceTo(targetVec) * 0.1 + centerOffsetAmount;
+                swarmVec.addScaledVector(offsetDir, distFactor * (0.5 + Math.random() * 0.8));
+                swarmPositions[i3] = swarmVec.x; swarmPositions[i3 + 1] = swarmVec.y; swarmPositions[i3 + 2] = swarmVec.z;
+            }
+            currentShapeIndex = nextShapeIndex;
+            morphState.progress = 0;
+            if (morphTimeline) morphTimeline.pause();
+            morphTimeline = anime({
+                 targets: morphState, progress: 1, duration: CONFIG.morphDuration, easing: 'cubicBezier(0.4, 0.0, 0.2, 1.0)',
+                 complete: () => {
+                     console.log("Morphing complete.");
+                     document.getElementById('info').innerText = `Shape: ${SHAPES[currentShapeIndex].name} (Click to morph)`;
+                     document.getElementById('info').style.textShadow = '0 0 5px rgba(0, 128, 255, 0.8)';
+                     currentPositions.set(targetPositions[currentShapeIndex]);
+                     particlesGeometry.attributes.position.needsUpdate = true;
+                     particleEffectStrengths.fill(0.0);
+                     particlesGeometry.attributes.aEffectStrength.needsUpdate = true;
+                     sourcePositions.set(targetPositions[currentShapeIndex]);
+                     updateColors();
+                     isMorphing = false; controls.autoRotate = true;
+                 }
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!isInitialized) return;
+            const elapsedTime = clock.getElapsedTime();
+            const deltaTime = clock.getDelta();
+            controls.update();
+            const positions = particlesGeometry.attributes.position.array;
+            const effectStrengths = particlesGeometry.attributes.aEffectStrength.array;
+
+            if (isMorphing) {
+                updateMorphAnimation(positions, effectStrengths, elapsedTime, deltaTime);
+            } else {
+                updateIdleAnimation(positions, effectStrengths, elapsedTime, deltaTime);
+            }
+            particlesGeometry.attributes.position.needsUpdate = true;
+            if (isMorphing || particlesGeometry.attributes.aEffectStrength.needsUpdate) {
+                 particlesGeometry.attributes.aEffectStrength.needsUpdate = true;
+            }
+            composer.render(deltaTime);
+        }
+
+        function updateMorphAnimation(positions, effectStrengths, elapsedTime, deltaTime) {
+            const t = morphState.progress;
+            const targets = targetPositions[currentShapeIndex];
+            const effectStrength = Math.sin(t * Math.PI);
+            const currentSwirl = effectStrength * CONFIG.swirlFactor * deltaTime * 50;
+            const currentNoise = effectStrength * CONFIG.noiseMaxStrength;
+
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                const i3 = i * 3;
+                sourceVec.fromArray(sourcePositions, i3);
+                swarmVec.fromArray(swarmPositions, i3);
+                targetVec.fromArray(targets, i3);
+
+                const t_inv = 1.0 - t; const t_inv_sq = t_inv * t_inv; const t_sq = t * t;
+                bezPos.copy(sourceVec).multiplyScalar(t_inv_sq);
+                bezPos.addScaledVector(swarmVec, 2.0 * t_inv * t);
+                bezPos.addScaledVector(targetVec, t_sq);
+
+                if (currentSwirl > 0.01) {
+                    tempVec.subVectors(bezPos, sourceVec);
+                    swirlAxis.set( noise3D(i * 0.02, elapsedTime * 0.1, 0), noise3D(0, i * 0.02, elapsedTime * 0.1 + 5), noise3D(elapsedTime * 0.1 + 10, 0, i * 0.02) ).normalize();
+                    tempVec.applyAxisAngle(swirlAxis, currentSwirl * (0.5 + Math.random() * 0.5));
+                    bezPos.copy(sourceVec).add(tempVec);
+                }
+
+                if (currentNoise > 0.01) {
+                    const noiseTime = elapsedTime * CONFIG.noiseTimeScale;
+                    noiseOffset.set( noise4D(bezPos.x * CONFIG.noiseFrequency, bezPos.y * CONFIG.noiseFrequency, bezPos.z * CONFIG.noiseFrequency, noiseTime), noise4D(bezPos.x * CONFIG.noiseFrequency + 100, bezPos.y * CONFIG.noiseFrequency + 100, bezPos.z * CONFIG.noiseFrequency + 100, noiseTime), noise4D(bezPos.x * CONFIG.noiseFrequency + 200, bezPos.y * CONFIG.noiseFrequency + 200, bezPos.z * CONFIG.noiseFrequency + 200, noiseTime) );
+                    bezPos.addScaledVector(noiseOffset, currentNoise);
+                }
+
+                positions[i3] = bezPos.x;
+                positions[i3 + 1] = bezPos.y;
+                positions[i3 + 2] = bezPos.z;
+
+                effectStrengths[i] = effectStrength;
+            }
+             particlesGeometry.attributes.aEffectStrength.needsUpdate = true;
+        }
+
+        function updateIdleAnimation(positions, effectStrengths, elapsedTime, deltaTime) {
+            const breathScale = 1.0 + Math.sin(elapsedTime * 0.5) * 0.015;
+            const timeScaled = elapsedTime * CONFIG.idleFlowSpeed;
+            const freq = 0.1;
+
+            let needsEffectStrengthReset = false;
+
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                const i3 = i * 3;
+                sourceVec.fromArray(sourcePositions, i3);
+                tempVec.copy(sourceVec).multiplyScalar(breathScale);
+                flowVec.set( noise4D(tempVec.x * freq, tempVec.y * freq, tempVec.z * freq, timeScaled), noise4D(tempVec.x * freq + 10, tempVec.y * freq + 10, tempVec.z * freq + 10, timeScaled), noise4D(tempVec.x * freq + 20, tempVec.y * freq + 20, tempVec.z * freq + 20, timeScaled) );
+                tempVec.addScaledVector(flowVec, CONFIG.idleFlowStrength);
+                currentVec.fromArray(positions, i3);
+                currentVec.lerp(tempVec, 0.05);
+                positions[i3] = currentVec.x;
+                positions[i3 + 1] = currentVec.y;
+                positions[i3 + 2] = currentVec.z;
+
+                if (effectStrengths[i] !== 0.0) {
+                    effectStrengths[i] = 0.0;
+                    needsEffectStrengthReset = true;
+                }
+            }
+             if (needsEffectStrengthReset) {
+                 particlesGeometry.attributes.aEffectStrength.needsUpdate = true;
+             }
+        }
+
+        function onCanvasClick(event) {
+            if (event.target.closest('#controls')) { return; }
+            triggerMorph();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+
+    </script>
+<!-- partial -->
+   <script  src="./script.js"></script>
+</body>
+</html>

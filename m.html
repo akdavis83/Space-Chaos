@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enemy Space Ships - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            font-size: 18px;
+            text-shadow: 0 0 5px #00aaff;
+        }
+        #ships-container {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 100;
+            padding: 0 10px;
+        }
+        .ship-button {
+            background: rgba(0, 60, 120, 0.7);
+            border: 2px solid #00aaff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            min-width: 100px;
+            margin: 5px;
+        }
+        .ship-button:hover {
+            background: rgba(0, 120, 200, 0.9);
+            transform: scale(1.1);
+        }
+        canvas {
+            display: block;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Enemy Space Ships Collection</div>
+    <div id="loading">Loading Space Ships...</div>
+    <div id="ships-container">
+        <button class="ship-button" data-ship="0">Scout</button>
+        <button class="ship-button" data-ship="1">Interceptor</button>
+        <button class="ship-button" data-ship="2">Bomber</button>
+        <button class="ship-button" data-ship="3">Destroyer</button>
+        <button class="ship-button" data-ship="4">Cruiser</button>
+        <button class="ship-button" data-ship="5">Dreadnought</button>
+        <button class="ship-button" data-ship="6">Stealth</button>
+        <button class="ship-button" data-ship="7">Flagship</button>
+        <button class="ship-button" data-ship="8">Carrier</button>
+        <button class="ship-button" data-ship="9">Mothership</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="js/spaceships.js"></script>
+</body>
+</html>

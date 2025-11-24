@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Space Chaos</title>
+  <link rel="stylesheet" href="https://public.codepenassets.com/css/reset-2.0.min.css">
+<link rel="stylesheet" href="./style2.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="container">
+	<canvas id="cardCanvas"></canvas>
+	<div id="score-container">Score: <span id="score">0</span></div>
+	<button id="restart-button" onclick="restartGame()" style="display:none;">Restart</button>
+</div>
+<div id="notification-center" style="display:none;">
+    <div id="notification-message"></div>
+</div>
+<!-- partial:index.partial.html -->
+<ul id="wrapper" style="text-decoration: none;">
+    <li><a href="#" id="home-link" style="text-decoration: none;">HOME <span class="number">H</span> </a></li>
+    <li><a href="#" id="pause-link" style="text-decoration: none;">PAUSE <span class="number">P</span> </a></li>
+    <li><a href="#" id="settings-link" style="text-decoration: none;">SETTINGS <span class="number">S</span> </a></li>
+</ul>
+<!-- partial -->
+  <script>
+    const wrapper = document.getElementById('wrapper');
+    // Remove the duplicate 'm' key handler since it's now in script.js
+    
+    // Add click handlers for menu items
+    document.getElementById('pause-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      // Trigger pause functionality (same as 'p' key)
+      const pauseEvent = new KeyboardEvent('keydown', { key: 'p' });
+      document.dispatchEvent(pauseEvent);
+      wrapper.classList.remove('show-menu'); // Hide menu after selection
+    });
+    
+    document.getElementById('settings-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      // Show controls panel
+      const controlsToggleBtn = document.querySelector('.toggle-controls-btn');
+      if (controlsToggleBtn) {
+        controlsToggleBtn.click();
+      }
+      wrapper.classList.remove('show-menu'); // Hide menu after selection
+    });
+    
+    document.getElementById('home-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      wrapper.classList.remove('show-menu'); // Just hide menu for now
+    });
+  </script>
+<!-- partial -->
+  <script  src="./script2.js"></script>
+
+</body>
+</html>
