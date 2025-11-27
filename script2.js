@@ -102,6 +102,32 @@ let isHovering = false;
 let pulseTime = 0;
 let lastTime = Date.now(); // Delta time tracking
 
+let musicStarted = false;
+
+// --- Music Manager ---
+const playlist = [
+    "Simulacra-chosic.com_.mp3",
+    "Powerful-Trap-(chosic.com).mp3",
+    "punch-deck-brazilian-street-fight(chosic.com).mp3",
+    "Hitman(chosic.com).mp3",
+    // Assuming these are the names of the other 2 files provided 
+    // If they have different names, please update them here:
+    "The-Sound-Of-Rain(chosic.com).mp3", 
+    "Volatile-Reaction(chosic.com).mp3"
+];
+
+const musicPlayer = new Audio();
+musicPlayer.volume = 0.4; // Background volume (lower than SFX)
+
+function playNextTrack() {
+    // Pick random track
+    const track = playlist[Math.floor(Math.random() * playlist.length)];
+    musicPlayer.src = "./" + track; // Assumes files are in same folder
+    musicPlayer.play().catch(e => console.log("Waiting for user interaction to play audio"));
+}
+
+musicPlayer.addEventListener('ended', playNextTrack);
+
 // --- Enemy Data & Configuration ---
 // All enemies enabled and balanced
 const enemyData = {
@@ -1014,4 +1040,5 @@ const sounds = {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.5);
     }
+
 };
