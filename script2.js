@@ -103,6 +103,7 @@ let pulseTime = 0;
 let lastTime = Date.now(); // Delta time tracking
 
 let musicStarted = false;
+let currentTrackIndex = 0; // Tracks the current song in the playlist for sequential playback.
 
 // --- Music Manager ---
 const playlist = [
@@ -119,6 +120,17 @@ const playlist = [
 const musicPlayer = new Audio();
 musicPlayer.volume = 0.4; // Background volume (lower than SFX)
 
+function playNextTrack() {
+    // Play tracks sequentially
+    const track = playlist[currentTrackIndex];
+    musicPlayer.src = "./" + track; // Assumes files are in same folder
+    musicPlayer.play().catch(e => console.log("Waiting for user interaction to play audio"));
+
+    // Move to the next track, or loop back to the start if at the end of the playlist
+    currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+}
+
+musicPlayer.addEventListener('ended', playNextTrack);
 function playNextTrack() {
     // Pick random track
     const track = playlist[Math.floor(Math.random() * playlist.length)];
@@ -1042,3 +1054,4 @@ const sounds = {
     }
 
 };
+
